@@ -33,6 +33,22 @@ export interface MagneticMeasurement {
   readonly sampleCount: number
 }
 
+/** What the on-device detector reported when the user saved a finding. Never proof of what the object is. */
+export interface DetectionSnapshot {
+  readonly label: string
+  readonly labelAr: string
+  readonly score: number
+  readonly trackId?: number
+  readonly widthPx: number
+  readonly heightPx: number
+  readonly estimate?: Readonly<{ widthCm: number; heightCm: number; widthErrCm: number; heightErrCm: number; reference: string }>
+}
+
+export interface ManualReview {
+  readonly checks: readonly string[]
+  readonly location: string
+}
+
 export interface Observation {
   readonly id: string
   readonly zoneId: ZoneId
@@ -43,6 +59,8 @@ export interface Observation {
   readonly createdAt: string
   readonly photoId?: string
   readonly magnetic?: MagneticMeasurement
+  readonly detection?: DetectionSnapshot
+  readonly review?: ManualReview
 }
 
 export interface ZoneRecord {

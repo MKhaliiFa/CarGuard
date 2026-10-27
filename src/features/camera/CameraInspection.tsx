@@ -7,6 +7,8 @@ import { savePhoto } from '../../lib/storage'
 import { ZONE_IDS, getZone } from '../../lib/zones'
 import type { ZoneId } from '../../lib/types'
 import { useInspection } from '../../state/InspectionContext'
+import type { DetectorLoader } from '../detection/detector'
+import { LiveDetection } from '../detection/LiveDetection'
 import { CaptureReview, type PendingCapture } from './CaptureReview'
 import { CAMERA_ERROR_TEXT, useCamera } from './useCamera'
 
@@ -16,7 +18,12 @@ function zoneFromHash(): ZoneId {
   return zone && (ZONE_IDS as readonly string[]).includes(zone) ? (zone as ZoneId) : 'obd'
 }
 
-export function CameraInspection() {
+interface CameraInspectionProps {
+  /** Injected in tests; production uses the real on-device model. */
+  readonly detectorLoader?: DetectorLoader
+}
+
+export function CameraInspection({ detectorLoader }: CameraInspectionProps = {}) {
   const { videoRef, ...cam } = useCamera()
   const { dispatch } = useInspection()
   const [zoneId, setZoneId] = useState<ZoneId>(zoneFromHash)
@@ -82,17 +89,19 @@ export function CameraInspection() {
         )}
 
         <div hidden={cam.status !== 'live' && cam.status !== 'starting'}>
-          <video
-            ref={videoRef}
-            playsInline
-            muted
-            autoPlay
-            aria-label="معاينة الكاميرا"
-            style={{ width: '100%', aspectRatio: '3 / 4', objectFit: 'cover', background: '#000', borderRadius: 'var(--radius-md)', display: 'block' }}
+          <LiveDetection
+            videoRef={videoRef}
+            cameraLive={cam.status === 'live'}
+            deviceId={cam.deviceId}
+            zoom={cam.zoom}
+            zoneId={zoneId}
+            captureFrame={cam.capture}
+            loader={detectorLoader}
+            video={<video ref={videoRef} playsInline muted autoPlay aria-label="معاينة الكاميرا" />}
           />
           {cam.status === 'starting' && <p className="faint" role="status">جارٍ تشغيل الكاميرا…</p>}
           {cam.status === 'live' && (
-            <div className="stack" style={{ marginTop: 'var(--space-3)' }}>
+            <div className="stack" style={{ marginTop: 'var(--space-3)' }} aria-label="أدوات الكاميرا">
               <div className="btn-row">
                 <button type="button" className="btn btn--primary" style={{ flex: 2 }} onClick={() => void onCapture()}>
                   التقاط صورة
@@ -106,6 +115,16 @@ export function CameraInspection() {
                   إيقاف
                 </button>
               </div>
+              {cam.devices.length > 1 && (
+                <div className="field">
+                  <label htmlFor="camera-select">الكاميرا</label>
+                  <select id="camera-select" className="input" value={cam.deviceId ?? ''} onChange={(e) => void cam.start(e.target.value)}>
+                    {cam.devices.map((d) => (
+                      <option key={d.id} value={d.id}>{d.label}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
               {!cam.torchAvailable && <p className="faint">الكشاف غير متاح من المتصفح على هذا الجهاز. استخدم كشاف هاتف آخر أو كشافًا يدويًا.</p>}
               {cam.zoomRange && cam.zoom !== undefined ? (
                 <div className="field">
@@ -135,7 +154,7 @@ export function CameraInspection() {
 
       <Callout title="حدود الفحص بالصور">
         <p>
-          الصورة تساعدك على التوثيق والمقارنة فقط. لا يحلل التطبيق الصور تلقائيًا، ولا يمكن لصورة وحدها إثبات أن جسمًا ما جهاز تتبع أو تسجيل.
+          الصورة تساعدك على التوثيق والمقارنة فقط. الكشف الحي يتعرف على فئات عامة مثل الهاتف والكوب، ولا يتعرف على أجهزة التتبع أو التسجيل، ولا يمكن لصورة وحدها إثبات أن جسمًا ما جهاز تتبع أو تسجيل.
           كثير من القطع الأصلية في السيارات تبدو كعلب سوداء صغيرة.
         </p>
       </Callout>
