@@ -42,6 +42,10 @@ services:
       - path: /manifest.webmanifest
         name: Cache-Control
         value: no-cache
+      # Render serves .webmanifest as octet-stream by default.
+      - path: /manifest.webmanifest
+        name: Content-Type
+        value: application/manifest+json
       # Hashed build assets never change.
       - path: /assets/*
         name: Cache-Control
