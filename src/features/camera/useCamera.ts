@@ -51,6 +51,8 @@ export function useCamera() {
   const [torchOn, setTorchOn] = useState(false)
   const [zoomRange, setZoomRange] = useState<ZoomRange>()
   const [zoom, setZoomState] = useState<number>()
+  const [devices, setDevices] = useState<readonly { id: string; label: string }[]>([])
+  const [deviceId, setDeviceId] = useState<string>()
   const streamRef = useRef<MediaStream | null>(null)
   const videoRef = useRef<HTMLVideoElement | null>(null)
 
@@ -64,8 +66,10 @@ export function useCamera() {
     setStatus((s) => (s === 'unsupported' ? s : 'idle'))
   }, [])
 
-  const start = useCallback(async () => {
+  const start = useCallback(async (requestedDeviceId?: string) => {
     if (!supported) return
+    streamRef.current?.getTracks().forEach((t) => t.stop())
+    streamRef.current = null
     if (!window.isSecureContext) {
       setError('insecure')
       setStatus('error')
@@ -76,7 +80,9 @@ export function useCamera() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: false,
-        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+        video: requestedDeviceId
+          ? { deviceId: { exact: requestedDeviceId }, width: { ideal: 1280 }, height: { ideal: 720 } }
+          : { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
       })
       streamRef.current = stream
       const video = videoRef.current
@@ -92,6 +98,14 @@ export function useCamera() {
       } else {
         setZoomRange(undefined)
       }
+      setDeviceId(stream.getVideoTracks()[0]?.getSettings?.().deviceId)
+      // Labels are only exposed after permission is granted, so enumerate now.
+      const all = (await navigator.mediaDevices.enumerateDevices?.().catch(() => [])) ?? []
+      setDevices(
+        all
+          .filter((d) => d.kind === 'videoinput')
+          .map((d, i) => ({ id: d.deviceId, label: d.label || `كاميرا ${i + 1}` })),
+      )
       setStatus('live')
     } catch (err) {
       setError(mapCameraError(err))
@@ -146,5 +160,5 @@ export function useCamera() {
     }
   }, [stop])
 
-  return { supported, status, error, videoRef, start, stop, capture, torchAvailable, torchOn, setTorch, zoomRange, zoom, setZoom }
+  return { supported, status, error, videoRef, start, stop, capture, torchAvailable, torchOn, setTorch, zoomRange, zoom, setZoom, devices, deviceId }
 }

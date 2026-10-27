@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "CarGuard \u2014 Arabic-first PWA that helps you inspect your own car for suspected hidden trackers or recorders",
+  "description": "CarGuard — Arabic-first PWA that helps you inspect your own car for suspected hidden trackers or recorders",
   "scripts": {
     "dev": "vite",
     "dev:lan": "vite --host",
@@ -19,6 +19,12 @@
   "dependencies": {
     "@fontsource/ibm-plex-mono": "^5.3.0",
     "@fontsource/ibm-plex-sans-arabic": "^5.3.0",
+    "@tensorflow-models/coco-ssd": "^2.2.3",
+    "@tensorflow/tfjs-backend-cpu": "4.22.0",
+    "@tensorflow/tfjs-backend-webgl": "^4.22.0",
+    "@tensorflow/tfjs-backend-webgpu": "^4.22.0",
+    "@tensorflow/tfjs-converter": "^4.22.0",
+    "@tensorflow/tfjs-core": "^4.22.0",
     "idb-keyval": "^6.3.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"

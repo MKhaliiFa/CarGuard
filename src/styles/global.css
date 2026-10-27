@@ -234,3 +234,17 @@ textarea.input { min-height: 90px; resize: vertical; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
+
+/* ---------- Live detection ---------- */
+.live-stage { position: relative; border-radius: var(--radius-md); overflow: hidden; background: #000; }
+.live-stage video { display: block; width: 100%; aspect-ratio: 3 / 4; object-fit: cover; }
+.live-overlay { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: manipulation; }
+.det-row {
+  all: unset; box-sizing: border-box; cursor: pointer; width: 100%; min-height: 44px;
+  display: grid; grid-template-columns: auto 1fr auto; gap: var(--space-3); align-items: center;
+}
+.det-row[aria-pressed='true'] strong { color: var(--c-amber); }
+.det-row:focus-visible { outline: 2px solid var(--c-focus); outline-offset: 4px; }
+@media (orientation: landscape) and (min-width: 700px) {
+  .live-stage video { aspect-ratio: 16 / 9; }
+}

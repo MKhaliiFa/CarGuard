@@ -1,0 +1,4 @@
+Model: SSDLite MobileNet v2 trained on COCO, from TensorFlow.js models
+Source: https://storage.googleapis.com/tfjs-models/savedmodel/ssdlite_mobilenet_v2/
+License: Apache License 2.0 (https://github.com/tensorflow/tfjs-models/blob/master/LICENSE)
+Modification: float32 weights re-encoded as float16 by scripts/quantize-model.mjs.

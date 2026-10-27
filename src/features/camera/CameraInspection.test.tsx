@@ -50,3 +50,21 @@ describe('CameraInspection', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 })
+
+describe('CameraInspection shutdown', () => {
+  it('releases every camera track when stopped and when the page unmounts', async () => {
+    const track = { stop: vi.fn(), getCapabilities: () => ({}), getSettings: () => ({ deviceId: 'cam1' }), applyConstraints: vi.fn() }
+    const stream = { getVideoTracks: () => [track], getTracks: () => [track] }
+    setMediaDevices({ getUserMedia: vi.fn().mockResolvedValue(stream), enumerateDevices: vi.fn().mockResolvedValue([]) })
+    // jsdom does not implement media playback.
+    vi.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue(undefined)
+    const { unmount } = renderWithInspection(<CameraInspection detectorLoader={vi.fn()} />)
+    await userEvent.click(screen.getByRole('button', { name: 'تشغيل الكاميرا الخلفية' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'إيقاف' }))
+    expect(track.stop).toHaveBeenCalledTimes(1)
+    await userEvent.click(screen.getByRole('button', { name: 'تشغيل الكاميرا الخلفية' }))
+    await screen.findByRole('button', { name: 'تشغيل الكشف الحي' })
+    unmount()
+    expect(track.stop).toHaveBeenCalledTimes(2)
+  })
+})

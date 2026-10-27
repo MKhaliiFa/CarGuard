@@ -1,7 +1,19 @@
 import { CLASSIFICATION_LABEL, STATUS_LABEL, formatDateTime } from './labels'
 import { TIER_LABEL, prioritizeZones } from './prioritize'
 import { ZONES } from './zones'
-import type { InspectionState } from './types'
+import type { InspectionState, Observation } from './types'
+
+/** One-line description of detector output and manual-review answers attached to an observation. */
+export function describeExtras(o: Observation): string {
+  const parts: string[] = []
+  if (o.detection) {
+    const d = o.detection
+    parts.push(`تصنيف النموذج: ${d.labelAr} (${d.label}) بثقة ${Math.round(d.score * 100)}%، الإطار ${d.widthPx}×${d.heightPx} بكسل`)
+    if (d.estimate) parts.push(`أبعاد تقريبية ${d.estimate.widthCm.toFixed(1)}±${d.estimate.widthErrCm.toFixed(1)} × ${d.estimate.heightCm.toFixed(1)}±${d.estimate.heightErrCm.toFixed(1)} سم بمرجع «${d.estimate.reference}»`)
+  }
+  if (o.review?.checks.length) parts.push(`علامات لاحظتها: ${o.review.checks.join('، ')}`)
+  return parts.join(' · ')
+}
 
 export const REPORT_DISCLAIMER =
   'هذا التقرير توثيق لفحص يدوي أجراه المستخدم. لا يثبت التطبيق وجود أجهزة تتبع أو تسجيل ولا ينفيه، ولا يحدد مكان أي جهاز. ' +
@@ -33,7 +45,7 @@ export function buildHtmlReport(state: InspectionState, photoDataUrls: ReadonlyM
     return `<section><h3>${e(z.title)}</h3>
 <p>الحالة: <b>${e(STATUS_LABEL[rec.status])}</b> · وقت الفحص: ${e(formatDateTime(rec.inspectedAt))}</p>
 ${rec.notes ? `<p class="notes">${e(rec.notes)}</p>` : ''}
-${obs.length ? `<ul>${obs.map((o) => `<li><span class="tag ${o.classification}">${e(CLASSIFICATION_LABEL[o.classification])}</span> ${e(o.text || 'بدون وصف')} <small>(${e(formatDateTime(o.createdAt))})</small></li>`).join('')}</ul>` : ''}
+${obs.length ? `<ul>${obs.map((o) => `<li><span class="tag ${o.classification}">${e(CLASSIFICATION_LABEL[o.classification])}</span> ${e(o.text || 'بدون وصف')}${describeExtras(o) ? `<br><small>${e(describeExtras(o))}</small>` : ''} <small>(${e(formatDateTime(o.createdAt))})</small></li>`).join('')}</ul>` : ''}
 ${rec.photoIds.length ? (photos ? `<div class="photos">${photos}</div>` : `<p><small>${rec.photoIds.length} صورة محفوظة على الجهاز ولم تُضمَّن في التقرير.</small></p>`) : ''}
 </section>`
   }).join('\n')

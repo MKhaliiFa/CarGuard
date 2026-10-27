@@ -30,10 +30,32 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
+        // The detection runtime and model are large and optional: never precache them on install.
+        globIgnores: ['**/models/**', '**/assets/tf-*.js', '**/assets/coco-*.js'],
         navigateFallback: '/index.html',
+        runtimeCaching: [
+          {
+            // Model files are immutable; cache after the user opts in so detection also works offline.
+            urlPattern: ({ url }) => url.origin === self.location.origin && (url.pathname.startsWith('/models/') || /\/assets\/(tf|coco)-/.test(url.pathname)),
+            handler: 'CacheFirst',
+            options: { cacheName: 'carguard-detection-model', expiration: { maxEntries: 20 } },
+          },
+        ],
       },
     }),
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        // Name the lazy detection chunks so the service worker can treat them separately.
+        manualChunks(id) {
+          if (id.includes('@tensorflow-models/coco-ssd')) return 'coco'
+          if (id.includes('@tensorflow/')) return 'tf'
+          return undefined
+        },
+      },
+    },
+  },
   test: {
     environment: 'jsdom',
     globals: true,
