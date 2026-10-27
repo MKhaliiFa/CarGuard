@@ -99,7 +99,7 @@ export function updateTracks(state: TrackerState, detections: readonly Detection
     if (match) return kept.push(match)
     const misses = track.misses + 1
     // Tentative tracks that vanish immediately were probably noise.
-    if (misses > MAX_MISSES || (track.state === 'tentative' && misses > 1)) return
+    if (misses > MAX_MISSES || (track.hits < CONFIRM_HITS && misses > 1)) return
     kept.push({ ...track, misses, state: 'lost' })
   })
 
