@@ -31,6 +31,22 @@ describe('report', () => {
     expect(buildHtmlReport(s, new Map([['p', 'data:image/jpeg;base64,AAAA']]))).toContain('data:image/jpeg;base64,AAAA')
   })
 
+  it('includes detector metadata and manual-review checks, escaped', () => {
+    const s = inspectionReducer(createInitialState(), {
+      type: 'addObservation',
+      observation: {
+        id: '1', zoneId: 'obd', kind: 'visual', source: 'user', classification: 'suspicious', text: 'x', createdAt: 'T',
+        detection: { label: 'cell phone', labelAr: 'هاتف محمول', score: 0.61, widthPx: 60, heightPx: 110 },
+        review: { checks: ['عليه ضوء <b>'], location: 'خلف الغطاء' },
+      },
+    })
+    const html = buildHtmlReport(s)
+    expect(html).toContain('هاتف محمول (cell phone) بثقة 61%')
+    expect(html).toContain('60×110 بكسل')
+    expect(html).toContain('عليه ضوء &lt;b&gt;')
+    expectNoDetectionClaims(html)
+  })
+
   it('exports JSON with the disclaimer', () => {
     const parsed = JSON.parse(buildJsonExport(createInitialState())) as { disclaimer: string; state: { version: number } }
     expect(parsed.disclaimer).toBe(REPORT_DISCLAIMER)

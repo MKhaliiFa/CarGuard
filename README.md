@@ -20,6 +20,16 @@ CarGuard is an Arabic-first, right-to-left Progressive Web App that helps you in
 
 Safety rule baked into the data model (`src/state/inspectionReducer.ts`): only `source: 'user'` observations can be `confirmed`. Sensor and Bluetooth data are clamped to `suspicious` at most, including when restoring stored data.
 
+## Live object detection (camera page)
+
+- **Model:** SSDLite MobileNet v2 trained on COCO (80 everyday classes), from TensorFlow.js models — **Apache-2.0** (`public/models/ssdlite_mobilenet_v2/NOTICE.txt`).
+- **Self-hosted, ~9 MB:** weights re-encoded float32 → float16 by `scripts/quantize-model.mjs`; `scripts/verify-quantized-model.mjs` checked max output difference (scores 4.8e-3, boxes 8.6e-3). Downloaded only after the user taps *تشغيل الكشف الحي*, then cached by the service worker (`carguard-detection-model`) for offline use. No frames leave the device. CSP unchanged (same-origin model, no WASM/eval).
+- **Runtime:** TF.js 4.22, lazy-loaded chunk (~280 KB gzip). Backend order: WebGPU (if `navigator.gpu`) → WebGL → CPU, with warm-up and automatic fallback.
+- **Loop:** `requestAnimationFrame` draws; inference at most every 120 ms, backs off to 1.5× last inference time; power-saver = 500 ms; pauses when the tab is hidden or the camera stops.
+- **UI:** green boxes on a canvas aligned to `object-fit: cover`, Arabic label + original class, confidence %, stable track IDs (IoU tracker) with status, tap or list to select, pixel size, centimetres **only after reference calibration** (bank card / A4 / custom) with ± error bars that exclude perspective, weight always *unavailable*, threshold slider, pause, camera switch, inference time.
+- **Manual review** for small electronics (wires, magnets, LED, SIM slot, mic hole…), location notes, zone, classification, optional frame — saved locally after confirmation as an observation with detector metadata.
+- **Not a tracker detector:** GPS/SIM trackers and recorders are not COCO classes. The model can only point at generic objects (e.g. *cell phone*, *remote*).
+
 ## Development
 
 ```bash
@@ -70,6 +80,7 @@ Automated tests run in jsdom and desktop Chrome with phone viewports. They **do 
 - [ ] Install to home screen on both; open in airplane mode → checklist and notes still work.
 - [ ] Export report (with and without photos) opens correctly; Delete all data empties everything.
 - [ ] Permission denial: deny camera / Bluetooth and confirm clear messages.
+- [ ] Live detection on both phones: model download progress, backend shown (WEBGPU/WEBGL), boxes stay aligned in portrait and landscape, phone temperature after 5 min (try power saver), camera switch, calibration with a bank card, manual review save, camera light turns off after *إيقاف* and after leaving the page.
 
 ## Known limitations
 

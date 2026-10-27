@@ -1,4 +1,5 @@
 import { CLASSIFICATION_LABEL, formatDateTime } from '../../lib/labels'
+import { describeExtras } from '../../lib/report'
 import type { Classification, Observation } from '../../lib/types'
 import { useInspection } from '../../state/InspectionContext'
 import { PhotoThumb } from '../../components/PhotoThumb'
@@ -31,6 +32,7 @@ export function ObservationList({ observations }: ObservationListProps) {
               {o.photoId && <PhotoThumb photoId={o.photoId} alt="صورة الملاحظة" size={64} />}
               <p style={{ flex: 1, whiteSpace: 'pre-wrap' }}>{o.text || 'بدون وصف'}</p>
             </div>
+            {describeExtras(o) && <p className="faint">{describeExtras(o)}</p>}
             {o.magnetic && (
               <p className="faint">
                 متوسط القراءة <span className="mono">{o.magnetic.meanMicroTesla.toFixed(1)} µT</span>، خط الأساس{' '}
