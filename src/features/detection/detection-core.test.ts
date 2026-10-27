@@ -137,6 +137,19 @@ describe('overlay geometry', () => {
     expect(calls).toContain('strokeRect:10,40,50,50')
     expect(calls.some((c) => c.startsWith('fillText:#7 كوب 87%'))).toBe(true)
   })
+
+  it('keeps the label on screen when the box extends past the cropped frame', () => {
+    const calls: string[] = []
+    const ctx = new Proxy({} as Record<string, unknown>, {
+      get: (target, prop: string) => (prop in target ? target[prop] : prop === 'measureText' ? () => ({ width: 50 }) : (...args: unknown[]) => calls.push(`${prop}:${args.join(',')}`)),
+      set: (target, prop: string, v) => ((target[prop] = v), true),
+    }) as unknown as CanvasRenderingContext2D
+    const track: Track = { id: 1, label: 'cat', score: 0.95, box: [-80, -10, 500, 400], hits: 3, misses: 0, state: 'tracked', lastSeen: 0 }
+    drawOverlay(ctx, [track], { scale: 1, offsetX: 0, offsetY: 0 }, 300, 300, 1, undefined)
+    // Label is 60 px wide (50 + padding), right-aligned to the canvas edge, top clamped to 0.
+    expect(calls).toContain('fillRect:240,0,60,20')
+    expect(calls.some((c) => c.startsWith('fillText:#1 قطة 95%,295,3'))).toBe(true)
+  })
 })
 
 describe('labels', () => {

@@ -43,6 +43,15 @@ npx playwright install chromium   # once, or set PW_CHANNEL=chrome to use instal
 npm run test:e2e   # responsive checks at iPhone 12, Reno12 F-sized and 320px viewports
 ```
 
+**Real-model e2e (optional):** `e2e/detection.spec.ts` runs the self-hosted model in Chromium against a fake camera, under the production CSP copied from `render.yaml`, and expects a *cat* in the list. It is skipped unless `DETECTION_FIXTURE` points to a video file (not committed):
+
+```bash
+ffmpeg -loop 1 -i cat.jpg -t 2 -r 15 -vf "scale=640:480,format=yuvj420p" -f mjpeg /tmp/cat.mjpeg
+DETECTION_FIXTURE=/tmp/cat.mjpeg npx playwright test --project=detection
+```
+
+The only CSP report it tolerates is `script-src wasm-eval`: `long.js` (a TF.js dependency) probes WebAssembly inside `try/catch` and falls back to JavaScript. The CSP intentionally stays without `'wasm-unsafe-eval'`.
+
 Camera, sensors, Bluetooth and service workers require a **secure context**. `localhost` counts; a LAN IP over plain HTTP does not. To test on a phone, deploy (below) or use an HTTPS tunnel.
 
 ## Deploying to Render

@@ -57,12 +57,14 @@ export function drawOverlay(
     ctx.strokeRect(x, y, w, h)
     const text = `#${track.id} ${arabicLabel(track.label)} ${Math.round(track.score * 100)}%`
     const tw = ctx.measureText(text).width + 10
-    const ty = y >= 22 ? y - 22 : y
+    // object-fit: cover crops the frame, so a box can extend past the visible area: keep its label on screen.
+    const right = Math.min(Math.max(x + w, tw), cssW)
+    const ty = Math.min(y >= 22 ? y - 22 : Math.max(y, 0), cssH - 20)
     ctx.fillStyle = color
-    ctx.fillRect(x + w - tw, ty, tw, 20)
+    ctx.fillRect(right - tw, ty, tw, 20)
     ctx.fillStyle = '#06210f'
     ctx.textAlign = 'right'
-    ctx.fillText(text, x + w - 5, ty + 3)
+    ctx.fillText(text, right - 5, ty + 3)
   }
   ctx.globalAlpha = 1
   ctx.setLineDash([])
