@@ -1,0 +1,51 @@
+:root {
+  --c-bg: #0b1014;
+  --c-bg-raised: #121a20;
+  --c-surface: #17212a;
+  --c-surface-2: #1e2a35;
+  --c-line: #2a3a47;
+  --c-line-strong: #3b5163;
+  --c-text: #e8edf1;
+  --c-text-dim: #9fb0bd;
+  --c-text-faint: #6d8191;
+
+  /* Semantic: amber = suspicious, red = user-confirmed, slate = inconclusive, teal = inspected/clear */
+  --c-amber: #f2b544;
+  --c-amber-bg: rgb(242 181 68 / 0.12);
+  --c-red: #ff6b5e;
+  --c-red-bg: rgb(255 107 94 / 0.12);
+  --c-teal: #4fd1b5;
+  --c-teal-bg: rgb(79 209 181 / 0.12);
+  --c-slate: #8aa0b3;
+  --c-slate-bg: rgb(138 160 179 / 0.12);
+  --c-focus: #7cc4ff;
+
+  --font-sans: 'IBM Plex Sans Arabic', system-ui, -apple-system, 'Segoe UI', Tahoma, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --text-xs: 0.78rem;
+  --text-sm: 0.88rem;
+  --text-base: clamp(0.98rem, 0.94rem + 0.2vw, 1.05rem);
+  --text-lg: 1.2rem;
+  --text-xl: clamp(1.45rem, 1.2rem + 1.2vw, 1.9rem);
+  --text-readout: clamp(2.4rem, 1.8rem + 3vw, 3.4rem);
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 36px;
+
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+
+  --shadow-raised: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 10px 30px -12px rgb(0 0 0 / 0.6);
+  --duration-fast: 140ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --nav-height: 64px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
+}

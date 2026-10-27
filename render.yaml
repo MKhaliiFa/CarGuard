@@ -1,0 +1,48 @@
+# Render Blueprint — deploys CarGuard as a static site (HTTPS is provided by Render).
+# Docs: https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: carguard
+    runtime: static
+    branch: main
+    autoDeploy: true
+    buildCommand: npm ci && npm run build
+    staticPublishPath: ./dist
+    pullRequestPreviewsEnabled: false
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+    headers:
+      # Security headers for every response.
+      - path: /*
+        name: Content-Security-Policy
+        value: "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; font-src 'self'; connect-src 'self'; media-src 'self' blob:; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'"
+      - path: /*
+        name: Permissions-Policy
+        value: "camera=(self), bluetooth=(self), magnetometer=(self), accelerometer=(self), gyroscope=(self), microphone=(), geolocation=(), payment=(), usb=(), serial=(), hid=()"
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /*
+        name: Referrer-Policy
+        value: no-referrer
+      - path: /*
+        name: Strict-Transport-Security
+        value: "max-age=31536000; includeSubDomains"
+      # The service worker and entry HTML must always be revalidated so updates reach users.
+      - path: /sw.js
+        name: Cache-Control
+        value: no-cache
+      - path: /index.html
+        name: Cache-Control
+        value: no-cache
+      - path: /manifest.webmanifest
+        name: Cache-Control
+        value: no-cache
+      # Hashed build assets never change.
+      - path: /assets/*
+        name: Cache-Control
+        value: "public, max-age=31536000, immutable"
