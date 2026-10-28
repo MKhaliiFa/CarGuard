@@ -42,6 +42,17 @@
   .hero-body { padding-inline-end: 0; }
   .hero h1 { padding-inline-end: 96px; }
   .hero .btn--lg { width: 100%; }
+  /* The eyebrow shares the top row with the ring, like the title does. It is direction: ltr (Latin label),
+     so logical margins would point away from the ring; use the page direction instead. */
+  [dir='rtl'] .hero .eyebrow { margin-left: 96px; }
+  [dir='ltr'] .hero .eyebrow { margin-right: 96px; }
+}
+@media (max-width: 360px) {
+  .hero .eyebrow { letter-spacing: 0.06em; }
+  .hero .eyebrow::before { display: none; }
+  /* Seven labels cannot sit side by side at this width; the step card right below names the current step,
+     and every dot keeps its full accessible name. */
+  .stepper-label { display: none; }
 }
 
 /* =========================================================
@@ -409,4 +420,102 @@
 .saved-check::after {
   content: ''; position: absolute; left: 7px; top: 5px; width: 6px; height: 10px;
   border: solid var(--c-ok); border-width: 0 2px 2px 0; transform: rotate(45deg);
+}
+
+/* =========================================================
+   Secondary screens (Bluetooth, Report, Settings)
+   Same vocabulary as the dashboard: icon tile + title + status chip, raised panels, mono numerals.
+   ========================================================= */
+.panel-head { display: flex; align-items: flex-start; gap: var(--space-3); margin-bottom: var(--space-3); }
+.panel-head-text { flex: 1; min-width: 0; }
+.panel-head h2 { margin: 0; font-size: var(--text-lg); line-height: 1.4; }
+.panel-head p { margin: 4px 0 0; }
+.panel-head > .chip { flex: none; margin-top: 4px; }
+.panel-head-chip { margin-top: var(--space-2); }
+.panel-icon {
+  display: grid; place-items: center; flex: none;
+  width: 38px; height: 38px; border-radius: 11px;
+  background: var(--c-accent-bg); color: var(--c-accent);
+}
+.panel-icon svg { width: 20px; height: 20px; }
+.panel-icon--neutral { background: var(--c-neutral-bg); color: var(--c-text-dim); }
+.panel-icon--danger { background: var(--c-danger-bg); color: var(--c-danger); }
+.panel-sub { margin: var(--space-4) 0 var(--space-2); font-size: var(--text-sm); color: var(--c-text-dim); }
+
+/* Numbered how-to steps: mono counters in small tiles instead of browser list markers. */
+.steps-list { list-style: none; counter-reset: step; margin: 0 0 var(--space-3); padding: 0; display: grid; gap: var(--space-2); }
+.steps-list > li {
+  counter-increment: step;
+  display: grid; grid-template-columns: 26px 1fr; gap: var(--space-3); align-items: start;
+  font-size: var(--text-sm); color: var(--c-text); margin: 0;
+}
+.steps-list > li::before {
+  content: counter(step);
+  display: grid; place-items: center; width: 26px; height: 26px; border-radius: 8px;
+  background: var(--c-surface-2); border: 1px solid var(--c-line);
+  font-family: var(--font-mono); font-size: var(--text-xs); color: var(--c-text-dim);
+}
+
+/* Plain-bullet facts with a small neutral marker (no green: green is reserved for completed checks). */
+.fact-list { list-style: none; margin: 0 0 var(--space-4); padding: 0; display: grid; gap: var(--space-2); }
+.fact-list > li { position: relative; padding-inline-start: var(--space-4); font-size: var(--text-sm); color: var(--c-text-dim); margin: 0; }
+.fact-list > li::before {
+  content: ''; position: absolute; inset-inline-start: 2px; top: 0.7em;
+  width: 6px; height: 6px; border-radius: 2px; background: var(--c-line-strong);
+}
+
+/* Recorded-result picker: even 2-up grid; an odd last option spans the row. */
+.choice-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2); }
+.choice-grid > :last-child:nth-child(odd) { grid-column: 1 / -1; }
+.choice-grid .btn { white-space: normal; }
+.choice-status { margin: 0 0 var(--space-2); }
+
+/* Report summary: three real counts, nothing inferred. */
+.stat-strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-2); margin-bottom: var(--space-4); }
+.stat {
+  padding: var(--space-3); border-radius: var(--radius-md);
+  border: 1px solid var(--c-line); background: var(--c-surface);
+  display: grid; gap: 2px; align-content: start; min-width: 0;
+}
+.stat-value { font-family: var(--font-mono); font-size: var(--text-xl); line-height: 1.1; direction: ltr; text-align: end; font-variant-numeric: tabular-nums; }
+.stat-value small { font-size: 0.55em; color: var(--c-text-faint); }
+.stat-label { font-size: var(--text-xs); color: var(--c-text-faint); line-height: 1.4; }
+.stat .bar { display: block; margin-top: var(--space-2); }
+
+.option-list { display: grid; gap: var(--space-3); }
+.option {
+  display: grid; gap: var(--space-2);
+  padding: var(--space-3) var(--space-4); border-radius: var(--radius-md);
+  border: 1px solid var(--c-line); background: var(--c-bg-raised);
+}
+.option p { margin: 0; font-size: var(--text-sm); color: var(--c-text-dim); }
+.option--primary { border-color: var(--c-line-strong); background: linear-gradient(180deg, var(--c-surface-2), var(--c-surface)); }
+
+/* Two platform cards (install guide). */
+.platform-grid { display: grid; gap: var(--space-3); }
+.platform { padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--c-line); background: var(--c-bg-raised); }
+.platform h3 { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-base); margin: 0 0 var(--space-3); }
+.platform h3 svg { width: 18px; height: 18px; color: var(--c-text-dim); }
+.platform .steps-list { margin-bottom: 0; }
+.install-now { margin-bottom: var(--space-4); }
+
+/* Destructive actions sit apart from everything else. */
+.danger-zone { margin-top: var(--space-4); padding-top: var(--space-4); border-top: 1px dashed rgb(255 107 94 / 0.3); }
+.danger-zone p { font-size: var(--text-xs); color: var(--c-text-faint); margin: var(--space-2) 0 0; }
+
+/* Capability rows (diagnostics). */
+.cap-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-3); align-items: center; }
+.cap-name { display: block; font-weight: 600; font-size: var(--text-sm); }
+.cap-note { display: block; font-size: var(--text-xs); color: var(--c-text-faint); margin-top: 2px; }
+
+/* Bluetooth device rows. */
+.device-head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-2); flex-wrap: wrap; margin-bottom: var(--space-2); }
+.device-head strong { overflow-wrap: anywhere; }
+.device-row .kv dd { overflow-wrap: anywhere; }
+.device-row .btn { margin-top: var(--space-3); }
+.panel-pad { padding: var(--space-4) var(--space-4) var(--space-2); }
+
+@media (min-width: 560px) {
+  .platform-grid { grid-template-columns: 1fr 1fr; }
+  .option-list { grid-template-columns: 1fr 1fr; }
 }

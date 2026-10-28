@@ -1,4 +1,5 @@
 import { Callout } from '../../components/Callout'
+import { IconInfo } from '../../components/icons'
 import { PageHead } from '../../components/PageHead'
 import { setIntroSeen } from '../../lib/prefs'
 import { InstallGuide } from '../install/InstallGuide'
@@ -16,12 +17,17 @@ export function MoreView() {
         <DiagnosticsPanel />
         <InstallGuide />
         <PrivacyPanel />
-        <div className="panel">
-          <h2>المقدمة التعريفية</h2>
-          <p className="muted">اعرض المقدمة القصيرة التي تشرح ما يفعله التطبيق وحدوده.</p>
+        <section className="panel" aria-labelledby="intro-replay-title">
+          <div className="panel-head">
+            <span className="panel-icon panel-icon--neutral"><IconInfo /></span>
+            <div className="panel-head-text">
+              <h2 id="intro-replay-title">المقدمة التعريفية</h2>
+              <p className="faint">اعرض المقدمة القصيرة التي تشرح ما يفعله التطبيق وحدوده.</p>
+            </div>
+          </div>
           <button
             type="button"
-            className="btn"
+            className="btn btn--ghost btn--block"
             onClick={() => {
               setIntroSeen(false)
               window.dispatchEvent(new Event(SHOW_INTRO_EVENT))
@@ -29,7 +35,7 @@ export function MoreView() {
           >
             عرض المقدمة مرة أخرى
           </button>
-        </div>
+        </section>
         <Callout title="عن التطبيق">
           <p>
             يساعدك هذا التطبيق على فحص سيارتك بشكل منظم. لا يوجد تطبيق ويب ولا مستشعر هاتف يمكنه كشف كل أجهزة التتبع أو التسجيل بشكل موثوق.

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Callout } from '../../components/Callout'
+import { IconBluetooth } from '../../components/icons'
 import { ZoneSelect } from '../../components/ZoneSelect'
 import { newId } from '../../lib/ids'
 import type { ZoneId } from '../../lib/types'
@@ -23,14 +24,14 @@ function DeviceRow({ device, onRecord }: { readonly device: SeenDevice; readonly
   const last = device.rssiSamples.at(-1)
   const strongest = device.rssiSamples.length ? Math.max(...device.rssiSamples) : undefined
   return (
-    <li>
-      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+    <li className="device-row">
+      <div className="device-head">
         <strong>{device.name || 'بدون اسم معلن'}</strong>
-        <span className="faint">{device.count} إعلان</span>
+        <span className="faint"><span className="mono">{device.count}</span> إعلان</span>
       </div>
-      <dl className="kv" style={{ marginTop: 'var(--space-1)' }}>
+      <dl className="kv">
         <dt>المعرّف داخل المتصفح</dt>
-        <dd style={{ overflowWrap: 'anywhere' }}>{device.id}</dd>
+        <dd>{device.id}</dd>
         <dt>آخر قوة إشارة</dt>
         <dd>{last !== undefined ? `${last} dBm` : 'لم يوفّرها المتصفح'}</dd>
         {strongest !== undefined && (
@@ -46,7 +47,7 @@ function DeviceRow({ device, onRecord }: { readonly device: SeenDevice; readonly
           </>
         )}
       </dl>
-      <button type="button" className="btn btn--ghost" style={{ marginTop: 'var(--space-2)' }} onClick={() => onRecord(device)}>
+      <button type="button" className="btn btn--ghost btn--sm" onClick={() => onRecord(device)}>
         تسجيل كملاحظة
       </button>
     </li>
@@ -147,8 +148,13 @@ export function WebBluetoothPanel() {
 
   return (
     <div className="stack">
-      <div className="panel">
-        <h2>البلوتوث من المتصفح</h2>
+      <section className="panel" aria-labelledby="bt-web">
+        <div className="panel-head">
+          <span className="panel-icon"><IconBluetooth /></span>
+          <div className="panel-head-text">
+            <h2 id="bt-web">البلوتوث من المتصفح</h2>
+          </div>
+        </div>
         {available === false && <Callout tone="warn" title="البلوتوث غير متاح">شغّل البلوتوث من إعدادات الهاتف ثم أعد تحميل الصفحة.</Callout>}
         <p className="muted">
           «اختيار جهاز» يفتح نافذة من المتصفح نفسه تعرض الأجهزة القريبة التي تبث حاليًا. التطبيق يعرف فقط الجهاز الذي تختاره أنت، ولا يحصل على قائمة كاملة.
@@ -157,14 +163,20 @@ export function WebBluetoothPanel() {
         <button type="button" className="btn btn--primary btn--block" onClick={() => void chooseDevice()}>
           اختيار جهاز قريب
         </button>
-        <p className="faint" style={{ marginTop: 'var(--space-2)' }}>
+        <p className="faint panel-sub">
           كثير من أجهزة التتبع تغيّر عنوانها باستمرار أو لا تظهر في هذه النافذة، لذلك عدم ظهور جهاز لا يعني عدم وجوده.
         </p>
-      </div>
+      </section>
 
       {bt.requestLEScan ? (
-        <div className="panel">
-          <h2>مسح الإعلانات القريبة (تجريبي)</h2>
+        <section className="panel" aria-labelledby="bt-scan">
+          <div className="panel-head">
+            <span className="panel-icon panel-icon--neutral"><IconBluetooth /></span>
+            <div className="panel-head-text">
+              <h2 id="bt-scan">مسح الإعلانات القريبة (تجريبي)</h2>
+            </div>
+            {scanning && <span className="chip">يعمل</span>}
+          </div>
           <p className="muted">
             هذا المتصفح يوفّر واجهة مسح تجريبية. يعرض المسح الإعلانات التي استقبلها المتصفح فعلًا مع قوة الإشارة لمدة ثلاثين ثانية بحد أقصى. تحرك ببطء بين مناطق السيارة ولاحظ أين تقوى الإشارة.
           </p>
@@ -173,8 +185,8 @@ export function WebBluetoothPanel() {
           ) : (
             <button type="button" className="btn btn--block" onClick={() => void startScan()}>بدء المسح</button>
           )}
-          {scanning && <p role="status" className="faint" style={{ marginTop: 'var(--space-2)' }}>المسح يعمل الآن. الأجهزة تظهر بالأسفل فور وصول إعلانات حقيقية.</p>}
-        </div>
+          {scanning && <p role="status" className="faint panel-sub">المسح يعمل الآن. الأجهزة تظهر بالأسفل فور وصول إعلانات حقيقية.</p>}
+        </section>
       ) : (
         <p className="faint">مسح الإعلانات المستمر غير متاح في هذا المتصفح، لذلك لا نعرض قوة الإشارة إلا إذا وفّرها المتصفح للجهاز المختار.</p>
       )}
@@ -183,7 +195,7 @@ export function WebBluetoothPanel() {
 
       {list.length > 0 && (
         <div className="panel panel--flush">
-          <div style={{ padding: 'var(--space-4) var(--space-4) 0' }}>
+          <div className="panel-pad">
             <h2>الأجهزة التي استقبلها المتصفح ({list.length})</h2>
             <ZoneSelect value={zoneId} onChange={setZoneId} label="المنطقة التي ستُربط بها الملاحظة" />
             {notice && <p role="status">{notice}</p>}

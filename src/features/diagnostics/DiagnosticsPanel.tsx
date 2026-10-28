@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { IconSettings } from '../../components/icons'
 import { detectCapabilities, type Capabilities } from '../../lib/capabilities'
 
 const ROWS: { key: keyof Capabilities; label: string; note: string }[] = [
@@ -17,26 +18,34 @@ const PLATFORM_LABEL = { ios: 'آيفون / آيباد', android: 'أندروي�
 
 export function DiagnosticsPanel() {
   const caps = useMemo(() => detectCapabilities(), [])
+  const available = ROWS.filter((r) => caps[r.key] === true).length
   return (
-    <div className="panel panel--flush">
-      <div style={{ padding: 'var(--space-4) var(--space-4) 0' }}>
-        <h2>توافق هذا الجهاز</h2>
+    <section className="panel panel--flush" aria-labelledby="caps-title">
+      <div className="panel-pad">
+        <div className="panel-head">
+          <span className="panel-icon"><IconSettings /></span>
+          <div className="panel-head-text">
+            <h2 id="caps-title">توافق هذا الجهاز</h2>
+          </div>
+          <span className="chip"><span className="mono">{available}/{ROWS.length}</span></span>
+        </div>
         <p className="faint">النظام المكتشف: {PLATFORM_LABEL[caps.platform]}. النتائج تعكس ما يتيحه هذا المتصفح فعلًا الآن.</p>
       </div>
       <ul className="list-reset row-list">
         {ROWS.map((r) => {
           const ok = caps[r.key] === true
+          // Neutral, not green: green is reserved for completed inspection steps.
           return (
-            <li key={r.key} style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 'var(--space-2)', alignItems: 'center' }}>
+            <li key={r.key} className="cap-row">
               <span>
-                <span style={{ display: 'block', fontWeight: 600 }}>{r.label}</span>
-                <span className="faint">{r.note}</span>
+                <span className="cap-name">{r.label}</span>
+                <span className="cap-note">{r.note}</span>
               </span>
-              <span className={`chip ${ok ? 'chip--inspected' : 'chip--not_inspected'}`}>{ok ? 'متاح' : 'غير متاح'}</span>
+              <span className={`chip ${ok ? '' : 'chip--unavailable'}`}>{ok ? 'متاح' : 'غير متاح'}</span>
             </li>
           )
         })}
       </ul>
-    </div>
+    </section>
   )
 }

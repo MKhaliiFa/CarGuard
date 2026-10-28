@@ -52,3 +52,15 @@ export const IconLock = (p: IconProps) => (
 export const IconSettings = (p: IconProps) => (
   <svg {...base} {...p}><circle cx="12" cy="12" r="3" /><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" /></svg>
 )
+export const IconPhone = (p: IconProps) => (
+  <svg {...base} {...p}><rect x="7" y="3" width="10" height="18" rx="2.5" /><path d="M11 18h2" /></svg>
+)
+export const IconDownload = (p: IconProps) => (
+  <svg {...base} {...p}><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5" /><path d="M5 19h14" /></svg>
+)
+export const IconTrash = (p: IconProps) => (
+  <svg {...base} {...p}><path d="M5 7h14M10 7V4.5h4V7M7 7l1 13h8l1-13" /></svg>
+)
+export const IconInfo = (p: IconProps) => (
+  <svg {...base} {...p}><circle cx="12" cy="12" r="8.5" /><path d="M12 11v5M12 8h.01" /></svg>
+)
