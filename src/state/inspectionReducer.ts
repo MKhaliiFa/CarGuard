@@ -2,9 +2,11 @@ import { ZONE_IDS } from '../lib/zones'
 import type {
   Classification,
   InspectionState,
+  JourneyStepId,
   MagneticBaseline,
   Observation,
   OsCheckResult,
+  StepMark,
   ZoneId,
   ZoneRecord,
   ZoneStatus,
@@ -23,6 +25,7 @@ export type InspectionAction =
   | { type: 'setBaseline'; baseline: MagneticBaseline | undefined }
   | { type: 'setOsCheck'; platform: 'android' | 'ios'; result: OsCheckResult; at: string }
   | { type: 'markBluetoothChecked' }
+  | { type: 'setStepMark'; step: JourneyStepId; mark: StepMark | undefined }
 
 const EMPTY_ZONE: ZoneRecord = { status: 'not_inspected', notes: '', photoIds: [] }
 
@@ -91,6 +94,10 @@ export function inspectionReducer(state: InspectionState, action: InspectionActi
       return { ...state, osChecks: { ...state.osChecks, [action.platform]: { result: action.result, at: action.at } } }
     case 'markBluetoothChecked':
       return { ...state, bluetoothChecked: true }
+    case 'setStepMark': {
+      const rest = Object.fromEntries(Object.entries(state.stepMarks ?? {}).filter(([id]) => id !== action.step))
+      return { ...state, stepMarks: action.mark ? { ...rest, [action.step]: action.mark } : rest }
+    }
   }
 }
 
@@ -114,5 +121,18 @@ export function normalizeState(raw: unknown): InspectionState {
     osChecks: { android: candidate.osChecks?.android ?? {}, ios: candidate.osChecks?.ios ?? {} },
     bluetoothChecked: candidate.bluetoothChecked === true,
     magneticBaseline: candidate.magneticBaseline,
+    stepMarks: normalizeStepMarks(candidate.stepMarks),
   }
+}
+
+const STEP_IDS: readonly JourneyStepId[] = ['prepare', 'visual', 'sensor', 'radio', 'record', 'review', 'report']
+
+function normalizeStepMarks(raw: unknown): InspectionState['stepMarks'] {
+  if (!raw || typeof raw !== 'object') return undefined
+  const marks: Partial<Record<JourneyStepId, StepMark>> = {}
+  for (const id of STEP_IDS) {
+    const m = (raw as Record<string, unknown>)[id]
+    if (m === 'done' || m === 'skipped') marks[id] = m
+  }
+  return marks
 }

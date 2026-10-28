@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useToast } from '../../components/Toast'
 import { AddObservationForm } from '../checklist/AddObservationForm'
 import { blobToDataUrl } from '../../lib/report'
 import type { ZoneId } from '../../lib/types'
@@ -24,6 +25,7 @@ export function CaptureReview({ capture, zoneTitle, zoneId, onSave, onDiscard, o
   const [savedId, setSavedId] = useState<string>()
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string>()
+  const toast = useToast()
 
   useEffect(() => {
     let cancelled = false
@@ -40,6 +42,7 @@ export function CaptureReview({ capture, zoneTitle, zoneId, onSave, onDiscard, o
     setError(undefined)
     try {
       setSavedId(await onSave())
+      toast('تم حفظ الصورة على هذا الجهاز')
     } catch (err) {
       console.error('Failed to save photo', err)
       setError('تعذّر حفظ الصورة على الجهاز. قد تكون مساحة التخزين ممتلئة.')
@@ -52,7 +55,7 @@ export function CaptureReview({ capture, zoneTitle, zoneId, onSave, onDiscard, o
     <div className="modal-backdrop">
       <div className="modal" role="dialog" aria-modal="true" aria-label="مراجعة الصورة" style={{ maxHeight: '92dvh', overflowY: 'auto' }}>
         <h2>مراجعة الصورة</h2>
-        {url && <img src={url} alt="الصورة الملتقطة" style={{ width: '100%', borderRadius: 'var(--radius-md)', display: 'block', marginBottom: 'var(--space-3)' }} />}
+        {url && <img className="capture-preview" src={url} alt="الصورة الملتقطة" />}
         {!savedId ? (
           <>
             <p className="muted">
@@ -63,14 +66,23 @@ export function CaptureReview({ capture, zoneTitle, zoneId, onSave, onDiscard, o
               <button type="button" className="btn btn--primary" onClick={() => void save()} disabled={saving}>
                 {saving ? 'جارٍ الحفظ…' : 'حفظ على هذا الجهاز'}
               </button>
-              <button type="button" className="btn btn--ghost" onClick={onDiscard} disabled={saving}>
+              <button
+                type="button"
+                className="btn btn--ghost"
+                onClick={() => {
+                  onDiscard()
+                  toast('تم تجاهل الصورة. لم يُحفظ شيء.', 'info')
+                }}
+                disabled={saving}
+              >
                 تجاهل الصورة
               </button>
             </div>
           </>
         ) : (
           <>
-            <p className="muted">تم حفظ الصورة محليًا. صِف ما تراه فيها إن كان مريبًا، أو أنهِ بدون ملاحظة.</p>
+            <p className="saved-note" role="status"><span className="saved-check" aria-hidden="true" />تم حفظ الصورة محليًا.</p>
+            <p className="muted">صِف ما تراه فيها إن كان مريبًا، أو أنهِ بدون ملاحظة.</p>
             <AddObservationForm zoneId={zoneId} photoId={savedId} onAdded={onDone} submitLabel="حفظ الملاحظة مع الصورة" />
             <button type="button" className="btn btn--ghost btn--block" style={{ marginTop: 'var(--space-2)' }} onClick={onDone}>
               إنهاء بدون ملاحظة

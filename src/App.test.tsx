@@ -13,6 +13,7 @@ beforeEach(() => {
   globalThis.indexedDB = new IDBFactory()
   resetStorageHandle()
   window.location.hash = '#/workflow'
+  localStorage.setItem('carguard.introSeen', '1')
 })
 
 describe('inspection workflow', () => {

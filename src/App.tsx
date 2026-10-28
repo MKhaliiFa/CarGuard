@@ -1,13 +1,15 @@
-import type { ComponentType, SVGProps } from 'react'
+import { useEffect, useState, type ComponentType, type SVGProps } from 'react'
 import { Callout } from './components/Callout'
+import { Intro } from './components/Intro'
 import { IconBluetooth, IconCamera, IconCar, IconMagnet, IconReport, IconSettings, IconSteps } from './components/icons'
 import { BluetoothView } from './features/bluetooth/BluetoothView'
 import { CameraInspection } from './features/camera/CameraInspection'
 import { ChecklistView } from './features/checklist/ChecklistView'
-import { MoreView } from './features/diagnostics/MoreView'
+import { MoreView, SHOW_INTRO_EVENT } from './features/diagnostics/MoreView'
 import { ReportView } from './features/report/ReportView'
 import { SensorView } from './features/sensors/SensorView'
 import { WorkflowView } from './features/workflow/WorkflowView'
+import { hasSeenIntro } from './lib/prefs'
 import { useHashRoute, type Route } from './lib/useHashRoute'
 import { useInspection } from './state/InspectionContext'
 
@@ -34,21 +36,33 @@ export function App() {
   const route = useHashRoute()
   const { ready, storageError } = useInspection()
   const View = VIEWS[route]
+  const [showIntro, setShowIntro] = useState(() => !hasSeenIntro())
+
+  useEffect(() => {
+    const open = () => {
+      window.location.hash = '#/workflow'
+      setShowIntro(true)
+    }
+    window.addEventListener(SHOW_INTRO_EVENT, open)
+    return () => window.removeEventListener(SHOW_INTRO_EVENT, open)
+  }, [])
 
   return (
     <>
       <header className="app-header">
-        <a className="brand" href="#/workflow">
-          <img src="/pwa-64x64.png" alt="" width={30} height={30} />
-          <span>
-            CarGuard
-            <small>فحص السيارة</small>
-          </span>
-        </a>
-        <span className="header-spacer" />
-        <a className="btn btn--ghost" href="#/more" aria-current={route === 'more' ? 'page' : undefined} aria-label="الإعدادات والتوافق">
-          <IconSettings width={20} height={20} />
-        </a>
+        <div className="app-header-inner">
+          <a className="brand" href="#/workflow">
+            <img src="/pwa-64x64.png" alt="" width={32} height={32} />
+            <span>
+              CarGuard
+              <small>فحص السيارة</small>
+            </span>
+          </a>
+          <span className="header-spacer" />
+          <a className="icon-btn" href="#/more" aria-current={route === 'more' ? 'page' : undefined} aria-label="الإعدادات والتوافق">
+            <IconSettings />
+          </a>
+        </div>
       </header>
       <main className="app-main" aria-busy={!ready}>
         {storageError && (
@@ -56,8 +70,10 @@ export function App() {
             <Callout tone="danger" role="alert">{storageError}</Callout>
           </div>
         )}
-        {/* Camera page is keyed by route so leaving it unmounts and releases the camera. */}
-        <View key={route} />
+        {/* Keyed by route: leaving the camera page unmounts it (releasing the camera) and replays the entry motion. */}
+        <div className="route-view" key={route}>
+          <View />
+        </div>
       </main>
       <nav className="bottom-nav" aria-label="التنقل الرئيسي">
         <ul>
@@ -71,6 +87,7 @@ export function App() {
           ))}
         </ul>
       </nav>
+      {showIntro && <Intro onClose={() => setShowIntro(false)} />}
     </>
   )
 }
