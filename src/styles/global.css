@@ -58,6 +58,7 @@ ul, ol { margin: 0 0 var(--space-3); padding-inline-start: 1.3em; }
 li + li { margin-top: var(--space-1); }
 li::marker { color: var(--c-text-faint); }
 a { color: var(--c-focus); text-underline-offset: 3px; }
+.nobr { white-space: nowrap; }
 code, .mono { font-family: var(--font-mono); direction: ltr; unicode-bidi: isolate; font-variant-numeric: tabular-nums; }
 strong { font-weight: 600; }
 

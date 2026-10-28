@@ -13,6 +13,11 @@ import { LiveDetection } from '../detection/LiveDetection'
 import { CaptureReview, type PendingCapture } from './CaptureReview'
 import { CAMERA_ERROR_TEXT, useCamera } from './useCamera'
 
+/** Keeps Latin tokens such as «OBD-II» on one line: a break at the hyphen scrambles bidi order in RTL. */
+function KeepLatin({ text }: { readonly text: string }) {
+  return text.split(/([A-Za-z0-9]+(?:-[A-Za-z0-9]+)+)/).map((part, i) => (i % 2 ? <span key={i} className="nobr">{part}</span> : part))
+}
+
 function zoneFromHash(): ZoneId {
   const query = window.location.hash.split('?')[1] ?? ''
   const zone = new URLSearchParams(query).get('zone')
@@ -97,7 +102,7 @@ export function CameraInspection({ detectorLoader }: CameraInspectionProps = {})
       <div className="panel cam-target">
         <ZoneSelect value={zoneId} onChange={setZoneId} />
         <details className="cam-hints">
-          <summary>ما الذي تبحث عنه في «{zone.title}»</summary>
+          <summary>ما الذي تبحث عنه في «<KeepLatin text={zone.title} />»</summary>
           <ul>{zone.whatToCheck.map((t) => <li key={t}>{t}</li>)}</ul>
         </details>
         <p className="faint cam-safety">{zone.safety[0]}</p>
