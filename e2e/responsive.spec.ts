@@ -82,8 +82,29 @@ test.describe('with intro dismissed', () => {
       .toBe('done')
     await page.reload()
     await expect(page.getByRole('button', { name: 'تابع الفحص: الفحص البصري' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'الخطوة 1: جهّز الفحص — مكتملة' })).toBeVisible()
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
     expect(overflow).toBeLessThanOrEqual(0)
+
+    // Control: without the IndexedDB record the journey starts over, so the restore above came from storage.
+    await page.evaluate(
+      () =>
+        new Promise<void>((resolve, reject) => {
+          const open = indexedDB.open('carguard')
+          open.onsuccess = () => {
+            const tx = open.result.transaction('kv', 'readwrite')
+            tx.objectStore('kv').delete('inspection-state')
+            tx.oncomplete = () => {
+              open.result.close()
+              resolve()
+            }
+            tx.onerror = () => reject(tx.error)
+          }
+        }),
+    )
+    await page.reload()
+    await expect(page.getByRole('button', { name: 'ابدأ فحص السيارة' }).first()).toBeVisible()
+    await expect(page.getByRole('button', { name: 'الخطوة 1: جهّز الفحص — لم تبدأ' })).toBeVisible()
   })
 
   test('camera: permission denied shows an honest error and leaves upload available', async ({ page }) => {

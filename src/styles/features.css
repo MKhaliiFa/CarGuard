@@ -151,9 +151,12 @@
 }
 .journey-card.is-forward { animation: card-in-forward var(--duration-normal) var(--ease-out); }
 .journey-card.is-back { animation: card-in-back var(--duration-normal) var(--ease-out); }
-/* RTL: "forward" content arrives from the left (the reading direction continues leftward). */
-@keyframes card-in-forward { from { opacity: 0; transform: translateX(-18px); } }
-@keyframes card-in-back { from { opacity: 0; transform: translateX(18px); } }
+/* RTL: "forward" content arrives from the left (the reading direction continues leftward).
+   The slide must stay smaller than the page gutter (.app-main inline padding, --space-4): a card that
+   starts past the viewport edge briefly widens the scrollable area and causes sideways page scroll. */
+.journey-card { --card-shift: calc(var(--space-4) - 6px); }
+@keyframes card-in-forward { from { opacity: 0; transform: translateX(calc(-1 * var(--card-shift))); } }
+@keyframes card-in-back { from { opacity: 0; transform: translateX(var(--card-shift)); } }
 .journey-card-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); margin-bottom: var(--space-2); }
 .journey-title { font-size: var(--text-xl); margin-bottom: var(--space-4); }
 .journey-facts { margin: 0 0 var(--space-4); display: grid; gap: var(--space-3); }
