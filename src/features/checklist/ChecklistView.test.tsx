@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { IDBFactory } from 'fake-indexeddb'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { resetStorageHandle } from '../../lib/storage'
-import { renderWithInspection } from '../../test/render'
+import { renderWithInspection, waitForHydration } from '../../test/render'
 import { ChecklistView } from './ChecklistView'
 
 beforeEach(() => {
@@ -22,6 +22,7 @@ describe('vehicle map', () => {
     const user = userEvent.setup()
     renderWithInspection(<ChecklistView />)
     await screen.findByRole('heading', { name: 'خريطة فحص السيارة' })
+    await waitForHydration()
 
     fireEvent.click(mapZone('الشنطة ومكان الإطار الاحتياطي'))
     const panel = document.getElementById('zone-trunk-spare')!
@@ -35,6 +36,7 @@ describe('vehicle map', () => {
   it('moves to the next zone that still needs a status', async () => {
     const user = userEvent.setup()
     renderWithInspection(<ChecklistView />)
+    await waitForHydration()
     await user.click(await screen.findByRole('button', { name: /منفذ التشخيص OBD-II/ }))
     const obd = document.getElementById('zone-obd')!
     await user.click(within(obd).getByLabelText('تم الفحص'))
