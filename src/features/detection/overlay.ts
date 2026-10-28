@@ -29,8 +29,9 @@ export function hitTest(tracks: readonly Track[], x: number, y: number): Track |
     .sort((a, b) => a.box[2] * a.box[3] - b.box[2] * b.box[3])[0]
 }
 
-export const BOX_COLOR = '#2fe07a'
-export const BOX_COLOR_SELECTED = '#f2b544'
+/** Neutral, not green: a box marks a generic object class, never a confirmed or suspicious device. */
+export const BOX_COLOR = '#e6eeeb'
+export const BOX_COLOR_SELECTED = '#8fd3ff'
 
 export function drawOverlay(
   ctx: CanvasRenderingContext2D,
@@ -62,7 +63,7 @@ export function drawOverlay(
     const ty = Math.min(y >= 22 ? y - 22 : Math.max(y, 0), cssH - 20)
     ctx.fillStyle = color
     ctx.fillRect(right - tw, ty, tw, 20)
-    ctx.fillStyle = '#06210f'
+    ctx.fillStyle = '#0a1214'
     ctx.textAlign = 'right'
     ctx.fillText(text, right - 5, ty + 3)
   }

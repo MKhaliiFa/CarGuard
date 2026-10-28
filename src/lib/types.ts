@@ -85,6 +85,12 @@ export interface MagneticBaseline {
   readonly at: string
 }
 
+/** The guided inspection journey, in order. */
+export type JourneyStepId = 'prepare' | 'visual' | 'sensor' | 'radio' | 'record' | 'review' | 'report'
+
+/** A mark the user set by hand on a step. Data-derived states (e.g. all zones inspected) take precedence. */
+export type StepMark = 'done' | 'skipped'
+
 export interface InspectionState {
   readonly version: 1
   readonly zones: Readonly<Record<ZoneId, ZoneRecord>>
@@ -92,4 +98,5 @@ export interface InspectionState {
   readonly osChecks: Readonly<{ android: OsCheckRecord; ios: OsCheckRecord }>
   readonly bluetoothChecked: boolean
   readonly magneticBaseline?: MagneticBaseline
+  readonly stepMarks?: Readonly<Partial<Record<JourneyStepId, StepMark>>>
 }

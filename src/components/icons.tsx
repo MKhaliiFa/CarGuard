@@ -22,6 +22,33 @@ export const IconBluetooth = (p: IconProps) => (
 export const IconReport = (p: IconProps) => (
   <svg {...base} {...p}><path d="M6 3h9l3 3v15H6z" /><path d="M9 11h6M9 15h6M9 7h3" /></svg>
 )
+export const IconCheck = (p: IconProps) => (
+  <svg {...base} {...p}><path d="m5 12.5 4.5 4.5L19 7.5" /></svg>
+)
+export const IconChevron = (p: IconProps) => (
+  <svg {...base} {...p}><path d="m14 6-6 6 6 6" /></svg>
+)
+export const IconSkip = (p: IconProps) => (
+  <svg {...base} {...p}><path d="M17 6v12M15 12 7 6v12z" /></svg>
+)
+export const IconTorch = (p: IconProps) => (
+  <svg {...base} {...p}><path d="M8 3h8l-1 6H9z" /><path d="M9 9h6v4l-1.5 8h-3L9 13z" /><path d="M12 13v2" /></svg>
+)
+export const IconStop = (p: IconProps) => (
+  <svg {...base} {...p}><rect x="6" y="6" width="12" height="12" rx="2" /></svg>
+)
+export const IconExpand = (p: IconProps) => (
+  <svg {...base} {...p}><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" /></svg>
+)
+export const IconCollapse = (p: IconProps) => (
+  <svg {...base} {...p}><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" /></svg>
+)
+export const IconShield = (p: IconProps) => (
+  <svg {...base} {...p}><path d="M12 3 5 6v6c0 4.2 3 7.6 7 9 4-1.4 7-4.8 7-9V6z" /><path d="m9 12 2 2 4-4" /></svg>
+)
+export const IconLock = (p: IconProps) => (
+  <svg {...base} {...p}><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></svg>
+)
 export const IconSettings = (p: IconProps) => (
   <svg {...base} {...p}><circle cx="12" cy="12" r="3" /><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" /></svg>
 )

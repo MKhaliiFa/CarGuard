@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Callout } from '../../components/Callout'
 import { ConfirmDialog } from '../../components/ConfirmDialog'
 import { PageHead } from '../../components/PageHead'
+import { useToast } from '../../components/Toast'
 import { blobToDataUrl, buildHtmlReport, buildJsonExport, downloadText } from '../../lib/report'
 import { loadPhoto } from '../../lib/storage'
 import { useInspection } from '../../state/InspectionContext'
@@ -14,7 +15,8 @@ function stamp(): string {
 }
 
 export function ReportView() {
-  const { state } = useInspection()
+  const { state, dispatch } = useInspection()
+  const toast = useToast()
   const [pending, setPending] = useState<ExportKind>()
   const [includePhotos, setIncludePhotos] = useState(false)
   const [status, setStatus] = useState<string>()
@@ -39,9 +41,12 @@ export function ReportView() {
         downloadText(`carguard-report-${stamp()}.html`, buildHtmlReport(state, urls), 'text/html')
       }
       setStatus('تم إنشاء الملف على جهازك. لم يُرسل لأي مكان.')
+      toast('تم إنشاء الملف على جهازك')
+      dispatch({ type: 'setStepMark', step: 'report', mark: 'done' })
     } catch (err) {
       console.error('Export failed', err)
       setStatus('تعذّر إنشاء الملف.')
+      toast('تعذّر إنشاء الملف', 'danger')
     }
   }
 

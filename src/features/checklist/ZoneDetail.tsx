@@ -1,5 +1,6 @@
 import { useId } from 'react'
 import { Callout } from '../../components/Callout'
+import { IconChevron } from '../../components/icons'
 import { PhotoThumb } from '../../components/PhotoThumb'
 import { deletePhoto } from '../../lib/storage'
 import { STATUS_LABEL, formatDateTime } from '../../lib/labels'
@@ -13,9 +14,12 @@ const STATUSES: ZoneStatus[] = ['not_inspected', 'inspected', 'needs_followup']
 
 interface ZoneDetailProps {
   readonly zone: ZoneDefinition
+  /** Opens the next zone that still needs a status, when there is one. */
+  readonly onNext?: () => void
+  readonly nextTitle?: string
 }
 
-export function ZoneDetail({ zone }: ZoneDetailProps) {
+export function ZoneDetail({ zone, onNext, nextTitle }: ZoneDetailProps) {
   const { state, dispatch } = useInspection()
   const record = state.zones[zone.id]
   const observations = state.observations.filter((o) => o.zoneId === zone.id)
@@ -27,7 +31,7 @@ export function ZoneDetail({ zone }: ZoneDetailProps) {
   }
 
   return (
-    <div className="stack" style={{ padding: 'var(--space-4)', borderTop: '1px solid var(--c-line)' }}>
+    <div className="stack zone-detail">
       <section aria-label="ما الذي تفحصه">
         <h3>ما الذي تفحصه</h3>
         <ul>{zone.whatToCheck.map((t) => <li key={t}>{t}</li>)}</ul>
@@ -71,16 +75,16 @@ export function ZoneDetail({ zone }: ZoneDetailProps) {
       <section aria-label="الصور">
         <div className="panel-title">
           <h3>الصور ({record.photoIds.length})</h3>
-          <a className="btn" href={`#/camera?zone=${zone.id}`}>التقاط صورة لهذه المنطقة</a>
+          <a className="btn btn--sm" href={`#/camera?zone=${zone.id}`}>التقاط صورة لهذه المنطقة</a>
         </div>
         {record.photoIds.length === 0 ? (
           <p className="faint">لا توجد صور محفوظة. الصور تُحفظ على جهازك فقط وبعد موافقتك.</p>
         ) : (
-          <ul className="list-reset" style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+          <ul className="list-reset photo-strip">
             {record.photoIds.map((p) => (
-              <li key={p} style={{ display: 'grid', gap: 4 }}>
+              <li key={p}>
                 <PhotoThumb photoId={p} alt={`صورة من ${zone.title}`} />
-                <button type="button" className="btn btn--ghost" style={{ minHeight: 32, padding: '2px 8px' }} onClick={() => void removePhoto(p)}>
+                <button type="button" className="btn btn--ghost btn--sm" onClick={() => void removePhoto(p)}>
                   حذف
                 </button>
               </li>
@@ -100,6 +104,13 @@ export function ZoneDetail({ zone }: ZoneDetailProps) {
           <AddObservationForm zoneId={zone.id} />
         </div>
       </details>
+
+      {onNext && (
+        <button type="button" className="btn btn--block zone-next" onClick={onNext}>
+          <span>المنطقة التالية{nextTitle ? `: ${nextTitle}` : ''}</span>
+          <IconChevron />
+        </button>
+      )}
     </div>
   )
 }

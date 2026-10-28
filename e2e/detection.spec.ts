@@ -24,6 +24,7 @@ test('real model detects an object from the camera under the production CSP', as
     document.addEventListener('securitypolicyviolation', (e) => console.error(`Content Security Policy violation: ${e.violatedDirective} ${e.blockedURI}`))
   })
 
+  await page.addInitScript(() => localStorage.setItem('carguard.introSeen', '1'))
   await page.goto('/#/camera')
   await page.getByRole('button', { name: 'تشغيل الكاميرا الخلفية' }).click()
   await page.getByRole('button', { name: 'تشغيل الكشف الحي' }).click()
